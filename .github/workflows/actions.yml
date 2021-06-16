@@ -1,0 +1,43 @@
+name: Check Docs Links
+
+on: pull_request
+#on: 
+#  schedule:
+#    # At 09:00 on Monday: https://crontab.guru/#0_9_*_*_1
+#    - cron:  '0 9 * * 1'
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby-version: ['3.0']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@473e4d8fe5dd94ee328fdfca9f8c9c7afc9dae5e
+      with:
+        ruby-version: ${{ matrix.ruby-version }}
+        bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+    - name: Install awesome Bot
+      run: gem install awesome_bot
+    - name: Check Docs Links
+      run: awesome_bot docs/*.md
+      
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Ruby 2.6
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: 2.6.x
+    - name: Checks
+      run: |
+        ruby .github/osia_convert.rb
+        gem install awesome_bot
+        ruby .github/osia_get_links.rb
+        awesome_bot check-unique.txt --allow-ssl -a 302,429 -w xbmc/xbmc      
