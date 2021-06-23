@@ -1,10 +1,9 @@
 name: Links validator
 
-on: pull_request
-#on: 
-#  schedule:
-#    # At 09:00 on Monday: https://crontab.guru/#0_9_*_*_1
-#    - cron:  '0 9 * * 1'
+on: 
+ schedule:
+   # At 09:00 on Monday: https://crontab.guru/#0_9_*_*_1
+   - cron:  '0 9 * * 1'
 
 jobs:
   linkChecker:
@@ -14,10 +13,10 @@ jobs:
 
       - name: Check links
         uses: lycheeverse/lychee-action@v1.0.8
-        with:
-          args: --verbose --no-progress **/*.md
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: --verbose --no-progress --timeout 5 --max-concurrency 2 **/*.md
       
       - name: Get current date
         id: date
