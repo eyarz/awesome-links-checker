@@ -1,10 +1,10 @@
-name: Links
+name: Links validator
 
 on: pull_request
-#   repository_dispatch:
-#   workflow_dispatch:
-#   schedule:
-#     - cron: "00 18 * * *"
+#on: 
+#  schedule:
+#    # At 09:00 on Monday: https://crontab.guru/#0_9_*_*_1
+#    - cron:  '0 9 * * 1'
 
 jobs:
   linkChecker:
@@ -12,16 +12,20 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Link Checker
+      - name: Check links
         uses: lycheeverse/lychee-action@v1.0.8
         with:
           args: --verbose --no-progress **/*.md
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=now::$(date +'%d-%m-%Y')"
         
-      - name: Create Issue From File
+      - name: Create issue when fail
         uses: peter-evans/create-issue-from-file@v2
         with:
-          title: Link Checker Report
+          title: Automated Links Checker Report for ${{ steps.date.outputs.now }}
           content-filepath: ./lychee/out.md
-          labels: report, automated issue
+          labels: links validator
